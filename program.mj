@@ -1,0 +1,17 @@
+// MiniJava program to calculate the factorial of a number
+
+class Factorial {
+    public static void main(String[] args) {
+        int number = 5;
+        int result = calculateFactorial(number);
+        System.out.println(result);
+    }
+
+    public static int calculateFactorial(int n) {
+        if (n <= 0) {
+            return 1;
+        } else {
+            return n * calculateFactorial(n - 1);
+        }
+    }
+}
