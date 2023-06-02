@@ -1,15 +1,19 @@
 #include "scanner.h"
 
-Scanner::Scanner(string input)
+Scanner::Scanner(string input /*, SymbolTable* table*/)
 {
-    // this->input = input;
+    /*
+    this->input = input;
     cout << "INPUT: " << input << endl
          << "SIZE: "
          << input.length() << endl
          << endl;
+    */
 
     pos = 0;
     line = 1;
+
+    // st = table;
 
     ifstream inputFile(input, ios::in);
     string line;
@@ -25,7 +29,7 @@ Scanner::Scanner(string input)
     else
         cout << "UNABLE TO OPEN FILE\n";
 
-    cout << this->input << endl;
+    cout << this->input << endl; // Input filling
 }
 
 int Scanner::getLine()
@@ -198,6 +202,7 @@ Scanner::nextToken()
         errorMsg += currentChar;
         lexicalError(errorMsg);
     }
+
     return tok;
 }
 
