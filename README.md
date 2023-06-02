@@ -1,6 +1,6 @@
 # SYNTACTIC ANALYSIS
 
-### LEXICAL
+### **LEXICAL**
 
 #### INTRO
 
@@ -29,19 +29,22 @@ main, new, public, return, static, String, System.out.println, this, true, void,
 
 • Reserved words are recognized as identifiers, except for "System.out.println" because it doesn't match the pattern of identifiers.
 
-### SYNTACTIC
+### **SYNTACTIC**
 
 To build a predictive recursive descent parser, we need to:
 
-1. Transform the grammar into LL(1):
+**1. Transform the grammar into LL(1):**
 
 a- Eliminate left recursion.
+
 b- Construct FIRST (and FOLLOW) sets.
+
 c- Left-factor, if necessary.
 
-2. Define a procedure for each non-terminal:
+**2. Define a procedure for each non-terminal:**
 
 a- Implement an option for each production (right-hand side).
+
 b- Invoke procedures for non-terminals as needed.
 
 #### GRAMMAR

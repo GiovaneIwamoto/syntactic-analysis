@@ -5,14 +5,12 @@ Parser::Parser(string input)
 	scanner = new Scanner(input);
 }
 
-void
-Parser::advance()
+void Parser::advance()
 {
 	lToken = scanner->nextToken();
 }
 
-void
-Parser::match(int t)
+void Parser::match(int t)
 {
 	if (lToken->name == t || lToken->attribute == t)
 		advance();
@@ -20,33 +18,28 @@ Parser::match(int t)
 		error("Erro inesperado");
 }
 
-void
-Parser::run()
+void Parser::run()
 {
-	advance();	
+	advance();
 
 	program();
-	
+
 	cout << "Compilação encerrada com sucesso!\n";
 }
 
-void
-Parser::program()
+void Parser::program()
 {
-	//TODO
-    mainClass();
+	// TODO
+	mainClass();
 }
 
-//Continuar....
+// Continuar....
 
-void
-Parser::mainClass()
+void Parser::mainClass()
 {
-    
 }
 
-void
-Parser::error(string str)
+void Parser::error(string str)
 {
 	cout << "Linha " << scanner->getLine() << ": " << str << endl;
 
