@@ -6,14 +6,14 @@ using namespace std;
 
 enum Names
 {
-    UNDEF,
-    ID,
-    INTEGER_LITERAL,
-    OP,
-    SEP,
-    RESERVED_KEYWORD,
-    WHITESPACE,
-    END_OF_FILE
+    UNDEF,            // 0
+    ID,               // 1
+    INTEGER_LITERAL,  // 2
+    OP,               // 3
+    SEP,              // 4
+    RESERVED_KEYWORD, // 5
+    WHITESPACE,       // 6
+    END_OF_FILE       // 7
 };
 
 class Token
