@@ -53,7 +53,7 @@ Scanner::nextToken()
 
     // ---------- END_OF_FILE ----------
     if (pos >= static_cast<int>(input.length()))
-        return new Token(END_OF_FILE);
+        return new Token(END_OF_FILE, "EOF");
 
     char currentChar = input[pos];
 
