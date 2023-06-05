@@ -29,7 +29,7 @@ Scanner::Scanner(string input /*, SymbolTable* table*/)
     else
         cout << "UNABLE TO OPEN FILE\n";
 
-    cout << this->input << endl; // Input filling
+    // cout << this->input << endl; // Input filling
 }
 
 int Scanner::getLine()

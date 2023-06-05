@@ -13,7 +13,8 @@ void Parser::advance()
 void Parser::match(int token_name, string token_lexeme)
 {
 	if ((lToken->name == token_name && lToken->lexeme == token_lexeme) ||
-		(lToken->name == 1 && token_lexeme == "ID"))
+		(lToken->name == 1 && token_lexeme == "ID") ||
+		(lToken->name == 2 && token_lexeme == "INTEGER_LITERAL"))
 		advance();
 	else
 		error("UNEXPECTED ERROR");
@@ -32,10 +33,13 @@ void Parser::run()
 void Parser::program()
 {
 	mainClass();
-	while (lToken->name == 1)
-		classDeclaration();
 
-	match(7, "EOF");
+	while (lToken->name == 1)
+	{
+		classDeclaration();
+	}
+
+	// match(7, "END_OF_FILE");
 }
 
 // 2. MainClass → class ID { public static void main (String[ ] ID){ Statement } }
@@ -197,7 +201,7 @@ void Parser::statement()
 		match(4, ")");
 		match(4, ";");
 	}
-	else if (lToken->name == 1 && lToken->lexeme == "ID")
+	else if (lToken->name == 1)
 	{
 		match(1, "ID");
 		if (lToken->name == 3 && lToken->lexeme == "=")
@@ -244,7 +248,36 @@ void Parser::statement()
 
 void Parser::expression()
 {
-	if (lToken->name == 1 && (lToken->lexeme == "ID" || lToken->lexeme == "INTEGER_LITERAL" || lToken->lexeme == "true" || lToken->lexeme == "false" || lToken->lexeme == "this"))
+
+	if (lToken->name == 1 && lToken->lexeme == "new")
+	{
+		advance();
+
+		// Expression → new int [ Expression ]
+		if (lToken->name == 1 && lToken->lexeme == "int")
+		{
+			advance();
+			match(4, "[");
+			expression();
+			match(4, "]");
+		}
+
+		// Expression → new ID ( )
+		else if (lToken->name == 1 && lToken->lexeme == "ID")
+		{
+			advance();
+			match(4, "(");
+			match(4, ")");
+		}
+		else
+		{
+			error("EXPRESSION ERROR");
+		}
+	}
+
+	// TODO: May have problems
+	//  if ((lToken->name == 1 && (lToken->lexeme == "ID" || lToken->lexeme == "true" || lToken->lexeme == "false" || lToken->lexeme == "this")) || (lToken->name == 2))
+	else if ((lToken->name == 1) || (lToken->name == 2))
 	{
 		advance();
 
@@ -288,32 +321,6 @@ void Parser::expression()
 			{
 				error("EXPRESSION ERROR");
 			}
-		}
-	}
-
-	else if (lToken->name == 1 && lToken->lexeme == "new")
-	{
-		advance();
-
-		// Expression → new int [ Expression ]
-		if (lToken->name == 1 && lToken->lexeme == "int")
-		{
-			advance();
-			match(4, "[");
-			expression();
-			match(4, "]");
-		}
-
-		// Expression → new ID ( )
-		else if (lToken->name == 1 && lToken->lexeme == "ID")
-		{
-			advance();
-			match(4, "(");
-			match(4, ")");
-		}
-		else
-		{
-			error("EXPRESSION ERROR");
 		}
 	}
 
