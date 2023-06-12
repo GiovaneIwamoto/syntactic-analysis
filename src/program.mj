@@ -1,9 +1,15 @@
-class MyClass {
-  public static void main(String[] args) {
-    
-{        int[10] = numbers;
-        numbers = new int[true];}
-    
-    
+class ID { 
+  public static void main (String[ ] ID){ 
+      if ( true ) 
+        System.out.println ( this ) ; 
+      else 
+        ID = false ; 
+    } 
   }
-}
+ 
+class ID extends ID { 
+  boolean ID ;
+  public int seila ( int seila ) { 
+    int ID ;
+    return false 
+}}

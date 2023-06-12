@@ -8,10 +8,12 @@ Parser::Parser(string input)
 void Parser::advance()
 {
 	lToken = scanner->nextToken();
+	cout << lToken->lexeme << " "; // TODO: Remove Printing
 }
 
 void Parser::match(int token_name, string token_lexeme)
 {
+
 	if ((lToken->name == token_name && lToken->lexeme == token_lexeme) ||
 		(lToken->name == 1 && token_lexeme == "ID") ||
 		(lToken->name == 2 && token_lexeme == "INTEGER_LITERAL"))
@@ -78,10 +80,10 @@ void Parser::classDeclaration()
 
 	match(4, "{");
 
-	while (lToken->name == 1)
+	while (lToken->name == 1 && lToken->lexeme != "public")
 		varDeclaration();
 
-	while (lToken->name == 1 || lToken->name == 4)
+	while (lToken->name == 1 || lToken->lexeme == "public")
 		methodDeclaration();
 
 	match(4, "}");
@@ -118,13 +120,45 @@ void Parser::methodDeclaration()
 	match(4, ")");
 	match(4, "{");
 
-	// VarDeclaration
-	while (lToken->name == 1)
-		varDeclaration();
+	// TODO: ID to VARDECLARATION and STATEMENT
+	//  VarDeclaration
+	while ((lToken->name == 1 && (lToken->lexeme == "int" || "boolean" || "ID")) || (lToken->lexeme == "int[]")) // FIRST VarDeclaration
+	{
+		advance();
+		if (lToken->name == 1 && lToken->lexeme == "ID")
+		{
+			advance();
+			match(4, ";");
+		}
+		else
+		{
+			break;
+		}
+	}
 
 	// Statement
 	while (lToken->lexeme != "return")
-		statement();
+	{
+		if ((lToken->name == 3 && lToken->lexeme == "="))
+		{
+			advance();
+			expression();
+			match(4, ";");
+		}
+		else if (lToken->name == 4 && lToken->lexeme == "[")
+		{
+			advance();
+			expression();
+			match(4, "]");
+			match(3, "=");
+			expression();
+			match(4, ";");
+		}
+		else
+		{
+			statement();
+		}
+	}
 
 	match(1, "return");
 
@@ -137,16 +171,8 @@ void Parser::methodDeclaration()
 // 6. Type → int[] | boolean | int | ID
 void Parser::type()
 {
-	if (lToken->name == 1 && lToken->lexeme == "int")
-	{
-		advance();
-		if (lToken->name == 4 && lToken->lexeme == "[")
-		{
-			advance();
-			match(4, "]");
-		}
-	}
-	else if (lToken->name == 1 && (lToken->lexeme == "boolean" || lToken->lexeme == "int" || lToken->lexeme == "ID"))
+
+	if (lToken->name == 1 && (lToken->lexeme == "int[]" || lToken->lexeme == "int" || lToken->lexeme == "boolean" || lToken->lexeme == "ID"))
 	{
 		advance();
 	}
@@ -275,9 +301,7 @@ void Parser::expression()
 		}
 	}
 
-	// TODO: May have problems
-	//  if ((lToken->name == 1 && (lToken->lexeme == "ID" || lToken->lexeme == "true" || lToken->lexeme == "false" || lToken->lexeme == "this")) || (lToken->name == 2))
-	else if ((lToken->name == 1) || (lToken->name == 2))
+	else if ((lToken->name == 1 && (lToken->lexeme == "ID" || lToken->lexeme == "true" || lToken->lexeme == "false" || lToken->lexeme == "this")) || (lToken->name == 2))
 	{
 		advance();
 
@@ -289,7 +313,7 @@ void Parser::expression()
 			match(4, "]");
 		}
 
-		else if (lToken->name == 4 && lToken->lexeme == ".")
+		if (lToken->name == 4 && lToken->lexeme == ".")
 		{
 			advance();
 
@@ -305,7 +329,7 @@ void Parser::expression()
 				advance();
 				match(4, "(");
 
-				if (lToken->name != 4)
+				if (lToken->lexeme != ")")
 				{
 					expression();
 
@@ -315,8 +339,10 @@ void Parser::expression()
 						expression();
 					}
 				}
+
 				match(4, ")");
 			}
+
 			else
 			{
 				error("EXPRESSION ERROR");
@@ -338,6 +364,7 @@ void Parser::expression()
 		expression();
 		match(4, ")");
 	}
+
 	else
 	{
 		error("INVALID EXPRESSION");
