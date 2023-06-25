@@ -30,7 +30,8 @@ void Parser::run()
 
 	program();
 
-	cout << "COMPILATION COMPLETED SUCCESSFULLY!\n";
+	cout << endl
+		 << "COMPILATION COMPLETED SUCCESSFULLY!\n";
 }
 
 // 1. Program → MainClass (ClassDeclaration)∗ EOF
@@ -82,11 +83,11 @@ void Parser::classDeclaration()
 
 	match(4, "{");
 
-	while (lToken->lexeme != "public")
+	// TODO:
+	while (lToken->lexeme != "public" && "}")
 		varDeclaration();
 
-	// TODO:
-	while (lToken->name == 5 || lToken->lexeme == "public")
+	while (lToken->lexeme == "public")
 		methodDeclaration();
 
 	match(4, "}");
@@ -124,7 +125,7 @@ void Parser::methodDeclaration()
 	match(4, "{");
 
 	//  (VarDeclaration)*
-	while (((lToken->name == 5) && (lToken->lexeme == "int" || "boolean")) || (lToken->name == 1))
+	while ((((lToken->name == 5) && (lToken->lexeme == "int" || "boolean")) || (lToken->name == 1)) && (lToken->lexeme != "return"))
 	{
 		if (lToken->name == 1)
 		{
@@ -139,20 +140,11 @@ void Parser::methodDeclaration()
 			// Statement case inside Method Declaration
 			if (lToken->name == 3 && lToken->lexeme == "=")
 			{
-				advance();
-				expression();
-				match(4, ";");
 				break;
 			}
 
 			if (lToken->name == 4 && lToken->lexeme == "[")
 			{
-				match(4, "[");
-				expression();
-				match(4, "]");
-				match(3, "=");
-				expression();
-				match(4, ";");
 				break;
 			}
 		}
@@ -215,7 +207,7 @@ void Parser::type()
 {
 	if (lToken->name == 5 && lToken->lexeme == "int")
 	{
-		advance();
+		match(5, "int");
 		if (lToken->name == 4 && lToken->lexeme == "[")
 		{
 			match(4, "[");
@@ -324,108 +316,19 @@ void Parser::statement()
 
 void Parser::expression()
 {
-
-	if (lToken->name == 5 && lToken->lexeme == "new")
+	// Expression →  ( Expression )
+	if (lToken->name == 4 && lToken->lexeme == "(")
 	{
 		advance();
+		expression();
+		match(4, ")");
 
-		// Expression → new int [ Expression ]
-		if (lToken->name == 5 && lToken->lexeme == "int")
+		// Expression → Expression Op Expression
+		if (lToken->name == 3 && lToken->lexeme != "!")
 		{
 			advance();
-			match(4, "[");
 			expression();
-			match(4, "]");
-
-			if (lToken->name == 4 && lToken->lexeme == ".")
-			{
-				advance();
-
-				// Expression → Expression . length
-				if (lToken->name == 5 && lToken->lexeme == "length")
-				{
-					advance();
-				}
-
-				// Expression → Expression . ID ( ( Expression (, Expression )*)? )
-				else if (lToken->name == 1)
-				{
-					advance();
-					match(4, "(");
-
-					if (lToken->lexeme != ")")
-					{
-						expression();
-
-						while (lToken->name == 4 && lToken->lexeme == ",")
-						{
-							advance();
-							expression();
-						}
-					}
-
-					match(4, ")");
-				}
-
-				else
-				{
-					error("EXPRESSION ERROR 1");
-				}
-			}
 		}
-
-		// Expression → new ID ( )
-		else if (lToken->name == 1)
-		{
-			advance();
-			match(4, "(");
-			match(4, ")");
-
-			if (lToken->name == 4 && lToken->lexeme == ".")
-			{
-				advance();
-
-				// Expression → Expression . length
-				if (lToken->name == 5 && lToken->lexeme == "length")
-				{
-					advance();
-				}
-
-				// Expression → Expression . ID ( ( Expression (, Expression )*)? )
-				else if (lToken->name == 1)
-				{
-					advance();
-					match(4, "(");
-
-					if (lToken->lexeme != ")")
-					{
-						expression();
-
-						while (lToken->name == 4 && lToken->lexeme == ",")
-						{
-							advance();
-							expression();
-						}
-					}
-
-					match(4, ")");
-				}
-
-				else
-				{
-					error("EXPRESSION ERROR 2");
-				}
-			}
-		}
-		else
-		{
-			error("EXPRESSION ERROR 3");
-		}
-	}
-
-	else if ((lToken->name == 1) || (lToken->name == 5 && (lToken->lexeme == "true" || lToken->lexeme == "false" || lToken->lexeme == "this")) || (lToken->name == 2))
-	{
-		advance();
 
 		// Expression → Expression [ Expression ]
 		if (lToken->name == 4 && lToken->lexeme == "[")
@@ -464,18 +367,6 @@ void Parser::expression()
 
 				match(4, ")");
 			}
-
-			else
-			{
-				error("EXPRESSION ERROR");
-			}
-		}
-		// Expression → Expression Op Expression
-
-		if (lToken->name == 3)
-		{
-			advance();
-			expression();
 		}
 	}
 
@@ -486,12 +377,168 @@ void Parser::expression()
 		expression();
 	}
 
-	// Expression →  ( Expression )
-	else if (lToken->name == 4 && lToken->lexeme == "(")
+	else if (lToken->name == 5 && lToken->lexeme == "new")
 	{
 		advance();
-		expression();
-		match(4, ")");
+
+		// Expression → new int [ Expression ]
+		if (lToken->name == 5 && lToken->lexeme == "int")
+		{
+			advance();
+			match(4, "[");
+			expression();
+			match(4, "]");
+
+			// Expression → Expression Op Expression
+			if (lToken->name == 3 && lToken->lexeme != "!")
+			{
+				advance();
+				expression();
+			}
+
+			// Expression → Expression [ Expression ]
+			if (lToken->name == 4 && lToken->lexeme == "[")
+			{
+				advance();
+				expression();
+				match(4, "]");
+			}
+
+			if (lToken->name == 4 && lToken->lexeme == ".")
+			{
+				advance();
+
+				// Expression → Expression . length
+				if (lToken->name == 5 && lToken->lexeme == "length")
+				{
+					advance();
+				}
+
+				// Expression → Expression . ID ( ( Expression (, Expression )*)? )
+				else if (lToken->name == 1)
+				{
+					advance();
+					match(4, "(");
+
+					if (lToken->lexeme != ")")
+					{
+						expression();
+
+						while (lToken->name == 4 && lToken->lexeme == ",")
+						{
+							advance();
+							expression();
+						}
+					}
+
+					match(4, ")");
+				}
+			}
+		}
+
+		// Expression → new ID ( )
+		else if (lToken->name == 1)
+		{
+			advance();
+			match(4, "(");
+			match(4, ")");
+
+			// Expression → Expression Op Expression
+			if (lToken->name == 3 && lToken->lexeme != "!")
+			{
+				advance();
+				expression();
+			}
+
+			// Expression → Expression [ Expression ]
+			if (lToken->name == 4 && lToken->lexeme == "[")
+			{
+				advance();
+				expression();
+				match(4, "]");
+			}
+
+			if (lToken->name == 4 && lToken->lexeme == ".")
+			{
+				advance();
+
+				// Expression → Expression . length
+				if (lToken->name == 5 && lToken->lexeme == "length")
+				{
+					advance();
+				}
+
+				// Expression → Expression . ID ( ( Expression (, Expression )*)? )
+				else if (lToken->name == 1)
+				{
+					advance();
+					match(4, "(");
+
+					if (lToken->lexeme != ")")
+					{
+						expression();
+
+						while (lToken->name == 4 && lToken->lexeme == ",")
+						{
+							advance();
+							expression();
+						}
+					}
+
+					match(4, ")");
+				}
+			}
+		}
+	}
+
+	else if (((lToken->name == 1)) || (lToken->name == 5 && (lToken->lexeme == "true" || lToken->lexeme == "false" || lToken->lexeme == "this")) || (lToken->name == 2))
+	{
+		advance();
+
+		// Expression → Expression Op Expression
+		if (lToken->name == 3 && lToken->lexeme != "!")
+		{
+			advance();
+			expression();
+		}
+
+		// Expression → Expression [ Expression ]
+		if (lToken->name == 4 && lToken->lexeme == "[")
+		{
+			advance();
+			expression();
+			match(4, "]");
+		}
+
+		if (lToken->name == 4 && lToken->lexeme == ".")
+		{
+			advance();
+
+			// Expression → Expression . length
+			if (lToken->name == 5 && lToken->lexeme == "length")
+			{
+				advance();
+			}
+
+			// Expression → Expression . ID ( ( Expression (, Expression )*)? )
+			else if (lToken->name == 1)
+			{
+				advance();
+				match(4, "(");
+
+				if (lToken->lexeme != ")")
+				{
+					expression();
+
+					while (lToken->name == 4 && lToken->lexeme == ",")
+					{
+						advance();
+						expression();
+					}
+				}
+				match(4, ")");
+			}
+		}
 	}
 
 	else
