@@ -12,22 +12,16 @@ Implementation of the lexical analyzer for the MiniJava programming language wit
 
 `2. INTEGER LITERALS` A sequence of decimal digits representing an integer number.
 
-`3. OPERATORS` && < > + - \* / = == != !
+`3. OPERATORS`
 
-`4. SEPARATORS` ( ) [ ] { } ; . ,
+`4. SEPARATORS`
 
 `5. RESERVED WORDS` boolean, class, else, extends, false, if, int, length,
 main, new, public, return, static, String, System.out.println, this, true, void, and while.
 
-`6. COMMENTS` Comments should be ignored. There are two types: line comments (starting with // and extending to the end of the line) and block comments (starting with /_ and ending with _/ without nesting).
+`6. COMMENTS` Comments should be ignored. There are two types: line comments and block comments.
 
 `7. WHITESPACE` Whitespace should be ignored. It includes \n \t \r \f.
-
-#### NOTE
-
-• "System.out.println" should be treated as a single reserved word and not as a method call.
-
-• Reserved words are recognized as identifiers, except for "System.out.println" because it doesn't match the pattern of identifiers.
 
 ### **SYNTACTIC**
 
