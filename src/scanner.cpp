@@ -82,12 +82,6 @@ Scanner::nextToken()
 
         else
         {
-            // string::size_type dotPos = lexeme.find('.');
-            // if (dotPos != string::npos)
-            // {
-            //     string errorMsg = "INVALID TOKEN: " + lexeme;
-            //     lexicalError(errorMsg);
-            // }
             if (lexeme == "System")
             {
                 while (pos < static_cast<int>(input.length()) && (isalnum(input[pos]) || input[pos] == '_' || input[pos] == '.'))

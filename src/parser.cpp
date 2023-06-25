@@ -564,6 +564,7 @@ void Parser::op()
 	}
 }
 
+// TODO: Fix Errors messages and remove this printing
 void Parser::error(string str)
 {
 	cout << endl
