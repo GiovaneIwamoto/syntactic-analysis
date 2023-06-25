@@ -3,6 +3,8 @@
 Parser::Parser(string input)
 {
 	scanner = new Scanner(input);
+
+	cout << "============================================================================" << endl;
 }
 
 void Parser::advance()
@@ -80,7 +82,7 @@ void Parser::classDeclaration()
 
 	match(4, "{");
 
-	while (lToken->name == 1 && lToken->lexeme != "public")
+	while (lToken->lexeme != "public")
 		varDeclaration();
 
 	while (lToken->name == 1 || lToken->lexeme == "public")
@@ -171,8 +173,19 @@ void Parser::methodDeclaration()
 // 6. Type → int[] | boolean | int | ID
 void Parser::type()
 {
+	if (lToken->name == 1 && lToken->lexeme == "int")
+	{
+		advance();
+		if (lToken->name == 4 && lToken->lexeme == "[")
+		{
+			match(4, "[");
+			match(4, "]");
+		}
+	}
 
-	if (lToken->name == 1 && (lToken->lexeme == "int[]" || lToken->lexeme == "int" || lToken->lexeme == "boolean" || lToken->lexeme == "ID"))
+	// TODO: Fix
+	// if (lToken->name == 1 && (lToken->lexeme == "boolean" || lToken->lexeme == "ID"))
+	else if ((lToken->name == 1 && lToken->lexeme == "boolean") || (lToken->name == 1 && lToken->lexeme != "int"))
 	{
 		advance();
 	}
@@ -286,18 +299,90 @@ void Parser::expression()
 			match(4, "[");
 			expression();
 			match(4, "]");
+
+			if (lToken->name == 4 && lToken->lexeme == ".")
+			{
+				advance();
+
+				// Expression → Expression . length
+				if (lToken->name == 1 && lToken->lexeme == "length")
+				{
+					advance();
+				}
+
+				// Expression → Expression . ID ( ( Expression (, Expression )*)? )
+				else if (lToken->name == 1 && lToken->lexeme == "ID")
+				{
+					advance();
+					match(4, "(");
+
+					if (lToken->lexeme != ")")
+					{
+						expression();
+
+						while (lToken->name == 4 && lToken->lexeme == ",")
+						{
+							advance();
+							expression();
+						}
+					}
+
+					match(4, ")");
+				}
+
+				else
+				{
+					error("EXPRESSION ERROR 1");
+				}
+			}
 		}
 
 		// Expression → new ID ( )
-		else if (lToken->name == 1 && lToken->lexeme == "ID")
+		else if (lToken->name == 1)
 		{
 			advance();
 			match(4, "(");
 			match(4, ")");
+
+			if (lToken->name == 4 && lToken->lexeme == ".")
+			{
+				advance();
+
+				// Expression → Expression . length
+				if (lToken->name == 1 && lToken->lexeme == "length")
+				{
+					advance();
+				}
+
+				// Expression → Expression . ID ( ( Expression (, Expression )*)? )
+				else if (lToken->name == 1)
+				{
+					advance();
+					match(4, "(");
+
+					if (lToken->lexeme != ")")
+					{
+						expression();
+
+						while (lToken->name == 4 && lToken->lexeme == ",")
+						{
+							advance();
+							expression();
+						}
+					}
+
+					match(4, ")");
+				}
+
+				else
+				{
+					error("EXPRESSION ERROR 2");
+				}
+			}
 		}
 		else
 		{
-			error("EXPRESSION ERROR");
+			error("EXPRESSION ERROR 3");
 		}
 	}
 
@@ -324,7 +409,7 @@ void Parser::expression()
 			}
 
 			// Expression → Expression . ID ( ( Expression (, Expression )*)? )
-			else if (lToken->name == 1 && lToken->lexeme == "ID")
+			else if (lToken->name == 1)
 			{
 				advance();
 				match(4, "(");
@@ -390,7 +475,10 @@ void Parser::op()
 
 void Parser::error(string str)
 {
-	cout << "LINE " << scanner->getLine() << ": " << str << endl;
+	cout << endl
+		 << endl
+		 << "LINE " << scanner->getLine() << ": " << str << endl
+		 << "============================================================================" << endl;
 
 	exit(EXIT_FAILURE);
 }
