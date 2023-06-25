@@ -27,7 +27,7 @@ main, new, public, return, static, String, System.out.println, this, true, void,
 
 To build a predictive recursive descent parser, we need to:
 
-**1. Transform the grammar into LL(1):**
+`1. TRANSFORM GRAMMAR INTO LL(1):`
 
 • Eliminate left recursion.
 
@@ -35,7 +35,7 @@ To build a predictive recursive descent parser, we need to:
 
 • Left-factor, if necessary.
 
-**2. Define a procedure for each non-terminal:**
+`2. DEFINE A PROCEDURE FOR EACH NON-TERMINAL:`
 
 • Implement an option for each production right-hand side.
 
