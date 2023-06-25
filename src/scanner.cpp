@@ -60,10 +60,12 @@ Scanner::nextToken()
     // ---------- ID OR RESERVED_KEYWORD ----------
     if (isalpha(currentChar))
     {
+
         lexeme += currentChar;
         pos++;
 
-        while (pos < static_cast<int>(input.length()) && (isalnum(input[pos]) || input[pos] == '_' || input[pos] == '.'))
+        // while (pos < static_cast<int>(input.length()) && (isalnum(input[pos]) || input[pos] == '_' || input[pos] == '.'))
+        while (pos < static_cast<int>(input.length()) && (isalnum(input[pos]) || input[pos] == '_'))
         {
             lexeme += input[pos];
             pos++;
@@ -73,25 +75,42 @@ Scanner::nextToken()
             lexeme == "int" || lexeme == "length" || lexeme == "main" ||
             lexeme == "new" || lexeme == "public" || lexeme == "return" ||
             lexeme == "static" || lexeme == "String" || lexeme == "this" ||
-            lexeme == "true" || lexeme == "void" || lexeme == "while" ||
-            lexeme == "System.out.println")
+            lexeme == "true" || lexeme == "void" || lexeme == "while")
         {
-            if (lexeme == "System.out.println")
-                tok = new Token(RESERVED_KEYWORD, "System.out.println");
-            else
-                tok = new Token(ID, lexeme);
+            tok = new Token(RESERVED_KEYWORD, lexeme); // CHANGE: Reserved keywords are no longer treated as ID
         }
 
         else
         {
-            string::size_type dotPos = lexeme.find('.');
-            if (dotPos != string::npos)
+            // string::size_type dotPos = lexeme.find('.');
+            // if (dotPos != string::npos)
+            // {
+            //     string errorMsg = "INVALID TOKEN: " + lexeme;
+            //     lexicalError(errorMsg);
+            // }
+            if (lexeme == "System")
             {
-                string errorMsg = "INVALID TOKEN: " + lexeme;
-                lexicalError(errorMsg);
+                while (pos < static_cast<int>(input.length()) && (isalnum(input[pos]) || input[pos] == '_' || input[pos] == '.'))
+                {
+                    lexeme += input[pos];
+                    pos++;
+                }
+                if (lexeme == "System.out.println")
+                {
+                    tok = new Token(RESERVED_KEYWORD, lexeme);
+                }
+                else
+                {
+                    string errorMsg = "INVALID TOKEN: " + lexeme;
+                    lexicalError(errorMsg);
+                }
             }
 
-            tok = new Token(ID, lexeme);
+            else
+            {
+
+                tok = new Token(ID, lexeme);
+            }
         }
     }
 

@@ -4,7 +4,7 @@ Parser::Parser(string input)
 {
 	scanner = new Scanner(input);
 
-	cout << "============================================================================" << endl;
+	cout << endl;
 }
 
 void Parser::advance()
@@ -38,7 +38,7 @@ void Parser::program()
 {
 	mainClass();
 
-	while (lToken->name == 1)
+	while (lToken->name == 5)
 	{
 		classDeclaration();
 	}
@@ -49,15 +49,15 @@ void Parser::program()
 // 2. MainClass → class ID { public static void main (String[ ] ID){ Statement } }
 void Parser::mainClass()
 {
-	match(1, "class");
+	match(5, "class");
 	match(1, "ID");
 	match(4, "{");
-	match(1, "public");
-	match(1, "static");
-	match(1, "void");
-	match(1, "main");
+	match(5, "public");
+	match(5, "static");
+	match(5, "void");
+	match(5, "main");
 	match(4, "(");
-	match(1, "String");
+	match(5, "String");
 	match(4, "[");
 	match(4, "]");
 	match(1, "ID");
@@ -71,10 +71,10 @@ void Parser::mainClass()
 // 3. ClassDeclaration → class ID (extends ID)? { (VarDeclaration)∗ (MethodDeclaration)∗}
 void Parser::classDeclaration()
 {
-	match(1, "class");
+	match(5, "class");
 	match(1, "ID");
 
-	if (lToken->name == 1 && lToken->lexeme == "extends")
+	if (lToken->name == 5 && lToken->lexeme == "extends")
 	{
 		advance();
 		match(1, "ID");
@@ -85,7 +85,8 @@ void Parser::classDeclaration()
 	while (lToken->lexeme != "public")
 		varDeclaration();
 
-	while (lToken->name == 1 || lToken->lexeme == "public")
+	// TODO:
+	while (lToken->name == 5 || lToken->lexeme == "public")
 		methodDeclaration();
 
 	match(4, "}");
@@ -102,7 +103,7 @@ void Parser::varDeclaration()
 // 5. MethodDeclaration → public Type ID ((Type ID (, Type ID)*)?) { (VarDeclaration)* (Statement)* return Expression ; }
 void Parser::methodDeclaration()
 {
-	match(1, "public");
+	match(5, "public");
 	type();
 	match(1, "ID");
 	match(4, "(");
@@ -122,23 +123,62 @@ void Parser::methodDeclaration()
 	match(4, ")");
 	match(4, "{");
 
-	// TODO: ID to VARDECLARATION and STATEMENT
-	//  VarDeclaration
-	while ((lToken->name == 1 && (lToken->lexeme == "int" || "boolean" || "ID")) || (lToken->lexeme == "int[]")) // FIRST VarDeclaration
+	//  (VarDeclaration)*
+	while (((lToken->name == 5) && (lToken->lexeme == "int" || "boolean")) || (lToken->name == 1))
 	{
-		advance();
-		if (lToken->name == 1 && lToken->lexeme == "ID")
+		if (lToken->name == 1)
 		{
 			advance();
-			match(4, ";");
+
+			if (lToken->name == 1)
+			{
+				advance();
+				match(4, ";");
+			}
+
+			// Statement case inside Method Declaration
+			if (lToken->name == 3 && lToken->lexeme == "=")
+			{
+				advance();
+				expression();
+				match(4, ";");
+				break;
+			}
+
+			if (lToken->name == 4 && lToken->lexeme == "[")
+			{
+				match(4, "[");
+				expression();
+				match(4, "]");
+				match(3, "=");
+				expression();
+				match(4, ";");
+				break;
+			}
 		}
-		else
+		else if ((lToken->name == 5) && (lToken->lexeme == "int" || "boolean"))
 		{
-			break;
+			advance();
+			if (lToken->name == 4 && lToken->lexeme == "[")
+			{
+				match(4, "[");
+				match(4, "]");
+
+				if (lToken->name == 1)
+				{
+					advance();
+					match(4, ";");
+				}
+			}
+			else if (lToken->name == 1)
+			{
+				advance();
+				match(4, ";");
+			}
 		}
 	}
 
-	// Statement
+	// (Statement)*
 	while (lToken->lexeme != "return")
 	{
 		if ((lToken->name == 3 && lToken->lexeme == "="))
@@ -162,7 +202,7 @@ void Parser::methodDeclaration()
 		}
 	}
 
-	match(1, "return");
+	match(5, "return");
 
 	expression();
 
@@ -173,7 +213,7 @@ void Parser::methodDeclaration()
 // 6. Type → int[] | boolean | int | ID
 void Parser::type()
 {
-	if (lToken->name == 1 && lToken->lexeme == "int")
+	if (lToken->name == 5 && lToken->lexeme == "int")
 	{
 		advance();
 		if (lToken->name == 4 && lToken->lexeme == "[")
@@ -182,10 +222,7 @@ void Parser::type()
 			match(4, "]");
 		}
 	}
-
-	// TODO: Fix
-	// if (lToken->name == 1 && (lToken->lexeme == "boolean" || lToken->lexeme == "ID"))
-	else if ((lToken->name == 1 && lToken->lexeme == "boolean") || (lToken->name == 1 && lToken->lexeme != "int"))
+	else if ((lToken->name == 5 && lToken->lexeme == "boolean") || (lToken->name == 1))
 	{
 		advance();
 	}
@@ -214,17 +251,17 @@ void Parser::statement()
 			statement();
 		match(4, "}");
 	}
-	else if (lToken->name == 1 && lToken->lexeme == "if")
+	else if (lToken->name == 5 && lToken->lexeme == "if")
 	{
 		advance();
 		match(4, "(");
 		expression();
 		match(4, ")");
 		statement();
-		match(1, "else");
+		match(5, "else");
 		statement();
 	}
-	else if (lToken->name == 1 && lToken->lexeme == "while")
+	else if (lToken->name == 5 && lToken->lexeme == "while")
 	{
 		advance();
 		match(4, "(");
@@ -288,12 +325,12 @@ void Parser::statement()
 void Parser::expression()
 {
 
-	if (lToken->name == 1 && lToken->lexeme == "new")
+	if (lToken->name == 5 && lToken->lexeme == "new")
 	{
 		advance();
 
 		// Expression → new int [ Expression ]
-		if (lToken->name == 1 && lToken->lexeme == "int")
+		if (lToken->name == 5 && lToken->lexeme == "int")
 		{
 			advance();
 			match(4, "[");
@@ -305,13 +342,13 @@ void Parser::expression()
 				advance();
 
 				// Expression → Expression . length
-				if (lToken->name == 1 && lToken->lexeme == "length")
+				if (lToken->name == 5 && lToken->lexeme == "length")
 				{
 					advance();
 				}
 
 				// Expression → Expression . ID ( ( Expression (, Expression )*)? )
-				else if (lToken->name == 1 && lToken->lexeme == "ID")
+				else if (lToken->name == 1)
 				{
 					advance();
 					match(4, "(");
@@ -349,7 +386,7 @@ void Parser::expression()
 				advance();
 
 				// Expression → Expression . length
-				if (lToken->name == 1 && lToken->lexeme == "length")
+				if (lToken->name == 5 && lToken->lexeme == "length")
 				{
 					advance();
 				}
@@ -386,7 +423,7 @@ void Parser::expression()
 		}
 	}
 
-	else if ((lToken->name == 1 && (lToken->lexeme == "ID" || lToken->lexeme == "true" || lToken->lexeme == "false" || lToken->lexeme == "this")) || (lToken->name == 2))
+	else if ((lToken->name == 1) || (lToken->name == 5 && (lToken->lexeme == "true" || lToken->lexeme == "false" || lToken->lexeme == "this")) || (lToken->name == 2))
 	{
 		advance();
 
@@ -403,7 +440,7 @@ void Parser::expression()
 			advance();
 
 			// Expression → Expression . length
-			if (lToken->name == 1 && lToken->lexeme == "length")
+			if (lToken->name == 5 && lToken->lexeme == "length")
 			{
 				advance();
 			}
@@ -432,6 +469,13 @@ void Parser::expression()
 			{
 				error("EXPRESSION ERROR");
 			}
+		}
+		// Expression → Expression Op Expression
+
+		if (lToken->name == 3)
+		{
+			advance();
+			expression();
 		}
 	}
 
