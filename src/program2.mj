@@ -1,6 +1,0 @@
-class ID { public static void main ( String[] ID ){ 
-    if ( true ) 
-        ID = false ; // Missing this (;) shows "UNEXPECTED ERROR"
-    else 
-        System.out.println ( ID );    
-}}

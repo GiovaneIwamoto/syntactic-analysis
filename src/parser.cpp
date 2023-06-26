@@ -21,7 +21,12 @@ void Parser::match(int token_name, string token_lexeme)
 		(lToken->name == 2 && token_lexeme == "INTEGER_LITERAL"))
 		advance();
 	else
+	{
+		cout << endl
+			 << endl
+			 << "EXPECTED: " << token_lexeme;
 		error("UNEXPECTED ERROR");
+	}
 }
 
 void Parser::run()
@@ -39,12 +44,12 @@ void Parser::program()
 {
 	mainClass();
 
-	while (lToken->name == 5)
+	while (lToken->name == 5 && lToken->lexeme == "class")
 	{
 		classDeclaration();
 	}
 
-	// match(7, "END_OF_FILE");
+	match(7, "EOF");
 }
 
 // 2. MainClass → class ID { public static void main (String[ ] ID){ Statement } }
@@ -83,7 +88,6 @@ void Parser::classDeclaration()
 
 	match(4, "{");
 
-	// TODO:
 	while (lToken->lexeme != "public" && "}")
 		varDeclaration();
 
@@ -578,13 +582,12 @@ void Parser::op()
 	}
 }
 
-// TODO: Fix Errors messages and remove this printing
 void Parser::error(string str)
 {
 	cout << endl
-		 << endl
+
 		 << "LINE " << scanner->getLine() << ": " << str << endl
-		 << "============================================================================" << endl;
+		 << endl;
 
 	exit(EXIT_FAILURE);
 }
