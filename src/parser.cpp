@@ -125,7 +125,7 @@ void Parser::methodDeclaration()
 	match(4, "{");
 
 	//  (VarDeclaration)*
-	while ((((lToken->name == 5) && (lToken->lexeme == "int" || "boolean")) || (lToken->name == 1)) && (lToken->lexeme != "return"))
+	while (lToken->lexeme != "return" && lToken->lexeme != "{" && lToken->lexeme != "if" && lToken->lexeme != "while" && lToken->lexeme != "System.out.println")
 	{
 		if (lToken->name == 1)
 		{
@@ -188,9 +188,13 @@ void Parser::methodDeclaration()
 			expression();
 			match(4, ";");
 		}
-		else
+		else if ((lToken->name == 1) || ((lToken->name == 5) && (lToken->lexeme == "System.out.println" || lToken->lexeme == "while" || lToken->lexeme == "if")) || (lToken->name == 4 && lToken->lexeme == "{"))
 		{
 			statement();
+		}
+		else
+		{
+			error("INVALID STATEMENT");
 		}
 	}
 
@@ -243,6 +247,7 @@ void Parser::statement()
 			statement();
 		match(4, "}");
 	}
+
 	else if (lToken->name == 5 && lToken->lexeme == "if")
 	{
 		advance();
@@ -253,6 +258,7 @@ void Parser::statement()
 		match(5, "else");
 		statement();
 	}
+
 	else if (lToken->name == 5 && lToken->lexeme == "while")
 	{
 		advance();
@@ -261,6 +267,7 @@ void Parser::statement()
 		match(4, ")");
 		statement();
 	}
+
 	else if (lToken->name == 5 && lToken->lexeme == "System.out.println")
 	{
 		advance();
@@ -269,6 +276,7 @@ void Parser::statement()
 		match(4, ")");
 		match(4, ";");
 	}
+
 	else if (lToken->name == 1)
 	{
 		match(1, "ID");
@@ -491,7 +499,7 @@ void Parser::expression()
 		}
 	}
 
-	else if (((lToken->name == 1)) || (lToken->name == 5 && (lToken->lexeme == "true" || lToken->lexeme == "false" || lToken->lexeme == "this")) || (lToken->name == 2))
+	else if ((lToken->name == 1 || 2) || (lToken->lexeme == "true" || "false" || "this"))
 	{
 		advance();
 
@@ -530,14 +538,20 @@ void Parser::expression()
 				{
 					expression();
 
-					while (lToken->name == 4 && lToken->lexeme == ",")
-					{
-						advance();
-						expression();
-					}
+					// while (lToken->name == 4 && lToken->lexeme == ",")
+					// {
+					// 	advance();
+					// 	expression();
+					// }
 				}
 				match(4, ")");
 			}
+		}
+
+		if (lToken->name == 4 && lToken->lexeme == ",")
+		{
+			advance();
+			expression();
 		}
 	}
 
