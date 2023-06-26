@@ -1,0 +1,6 @@
+class ID { 
+  public static void main (String[ ] ID){ 
+      while ( 0 )
+        ID [ ID ] = 1 ;
+    } 
+  }
