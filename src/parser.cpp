@@ -301,12 +301,12 @@ void Parser::statement()
 		}
 		else
 		{
-			error("DECLARATION ERROR");
+			error("STATEMENT ERROR");
 		}
 	}
 	else
 	{
-		error("INVALID DECLARATION");
+		error("INVALID STATEMENT");
 	}
 }
 
