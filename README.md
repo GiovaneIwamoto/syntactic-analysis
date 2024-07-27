@@ -31,27 +31,7 @@ The predictive descending parser will be capable of traversing the source progra
 ```
 
 > [!WARNING]
-> Reserved words are recognized as identifiers, except for System.out.println because it doesn't match the pattern of identifiers.
-
----
-
-### **SYNTACTIC OVERVIEW**
-
-Build a predictive recursive descent parser:
-
-`1. TRANSFORM GRAMMAR INTO LL(1):`
-
-• Eliminate left recursion.
-
-• Construct FIRST and FOLLOW sets.
-
-• Left-factor if necessary.
-
-`2. DEFINE A PROCEDURE FOR EACH NON-TERMINAL:`
-
-• Implement an option for each production right-hand side.
-
-• Invoke procedures for non-terminals as needed.
+> Reserved words are recognized as identifiers, with the notable exception of System.out.println, because it doesn't match the typical pattern of identifiers.
 
 ---
 
